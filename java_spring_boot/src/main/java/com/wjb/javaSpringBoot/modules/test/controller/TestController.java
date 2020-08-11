@@ -65,7 +65,7 @@ public class TestController {
     }
 
     /**
-     * 127.0.0.1:8085/test/logTest ---- get
+     * 127.0.0.1:8085/test/logTest ----  get
      */
     @GetMapping("/logTest")
     @ResponseBody
