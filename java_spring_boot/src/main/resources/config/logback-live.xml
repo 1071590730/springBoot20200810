@@ -3,7 +3,7 @@
 	scan：程序运行时配置文件被修改，是否重新加载。true，重新加载；false,不重新加载；默认为true;
 	scanPeriod：监测配置文件被修改的时间间隔，scan属性必须设置为true才可生效；默认为1分钟，默认单位,包括：milliseconds、seconds、minutes和hours;
 	debug：是否打印logback程序运行的日志信息。true,打印；false,不打印；默认为false;
-	格式:
+	格式 ；
 		%d{HH:mm:ss.SSS}：表示格式化日期输出，14:06:49.812；
 		%line:输出执行日志请求的行号。
 		%thread：表示产生日志的线程名；
