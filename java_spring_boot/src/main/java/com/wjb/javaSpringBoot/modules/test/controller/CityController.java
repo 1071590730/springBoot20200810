@@ -21,7 +21,7 @@ public class CityController {
     private CityService cityService;
 
     /**
-     * 127.0.0.1/api/cities/522 ----- get
+     * 127.0.0.1/api/cities/522 ---- get
      */
     @GetMapping("/cities/{countryId}")
     public List<City> getCitiesByCountryId(@PathVariable  int countryId) {
