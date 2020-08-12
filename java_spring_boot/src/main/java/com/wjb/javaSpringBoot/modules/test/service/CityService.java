@@ -1,6 +1,7 @@
 package com.wjb.javaSpringBoot.modules.test.service;
 
 import com.github.pagehelper.PageInfo;
+import com.wjb.javaSpringBoot.modules.common.vo.Result;
 import com.wjb.javaSpringBoot.modules.common.vo.SearchVo;
 import com.wjb.javaSpringBoot.modules.test.entity.City;
 
@@ -15,4 +16,11 @@ public interface CityService {
 
     PageInfo<City> getCitiesBySearchVo(int countryId, SearchVo searchVo);
 
+    PageInfo<City> getCitiesBySearchVo(SearchVo SearchVo);
+
+    Result<City> insertCity(City city);
+
+    Result<City> updateCity(City city);
+
+    Result<Object> deleteCity(int cityId);
 }
