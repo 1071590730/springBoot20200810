@@ -34,6 +34,7 @@ public class CityServiceImpl implements CityService {
     //分页查询
     @Override
     public PageInfo<City> getCitiesBySearchVo(int countryId, SearchVo searchVo) {
+        searchVo.initSearchVo();//初始化当前页和默认值
         PageHelper.startPage(searchVo.getCurrentPage(), searchVo.getPageSize());
         return new PageInfo<City>(
                 Optional.ofNullable(cityDao.getCitiesByCountryId(countryId))
