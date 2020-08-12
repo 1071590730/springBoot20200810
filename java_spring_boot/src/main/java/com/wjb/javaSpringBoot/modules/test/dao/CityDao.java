@@ -18,6 +18,7 @@ public interface CityDao {
     @Select("select * from m_city where country_id = #{countryId}")
     List<City> getCitiesByCountryId(int countryId);
 
+    // test
     List<City> getCitiesByCountrySearchVo(SearchVo SearchVo);
 
 }
