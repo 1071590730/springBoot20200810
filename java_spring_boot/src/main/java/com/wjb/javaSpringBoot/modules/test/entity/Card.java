@@ -7,12 +7,17 @@ import javax.persistence.*;
 /**
  * Created by ASUS on 2020/8/12 19:36
  */
+//@Entity指明实体 bean
 @Entity
+//@Table映射到数据库中的表(name = "h_card")
 @Table(name = "h_card")
 public class Card {
+    //对应表中的主键
     @Id
+    //@GeneratedValue主键属性 自动增长
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cardId;
+    //表中的列（name = "字段", length = 长度, unique = 是否为空）
     @Column(name = "card_no", length = 33, unique = true)
     private String cardNo;
 

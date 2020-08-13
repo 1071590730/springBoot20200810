@@ -2,6 +2,7 @@ package com.wjb.javaSpringBoot.modules.common.vo;
 
 /**
  * Created by ASUS on 2020/8/11 19:53
+ * 页面信息
  */
 
 public class SearchVo {

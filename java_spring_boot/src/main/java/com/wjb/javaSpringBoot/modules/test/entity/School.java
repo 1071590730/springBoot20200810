@@ -13,6 +13,7 @@ public class School {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int schoolId;
     private int schoolName;
+    //@Transient实体 bean 的属性不参与到数据库的映射
     @Transient
     private String region;
 
