@@ -82,6 +82,7 @@ Spring Boot 基础介绍
 				insertable、updatable：标识该属性是否参与插入和更新插入
 		@ManyToMany
 			@JoinTable ---- 中间表
+		@Query
 搭建 Spring Boot 框架
 	folder、source folder、resource folder、package 四者的区别
 	规范性：结构清晰、缩进清晰、命名清晰、逻辑清晰
@@ -302,7 +303,156 @@ Spring Data Jpa
                 在包结构src/main/java 下 创建一个和源码一样的报名和类
                 然后把对应类的源码复制过来，用替换功能 把全部的 TreeMap 替换成 LinkedHashMap，这样 再生成表，字段就变成有序了
 
+============= day_04 ===========
+Jpa
+	父接口应用
+		分页带条件查询
+			findall（）
+			findall（sort）
+			findall（pageable）
+			findall（example， pageable） ---- 带条件分页查询，需要给定一个模版，按照模版封装的内容进行查询
 
+	属性查询
+		接口方法命名：findBy + Top || First（option） + 属性 + 关键字 + 属性（option）
+			查询关键字列表
+			And ---- findByLastnameAndFirstname ---- … where x.lastname = ?1 and x.firstname = ?2；
+			Or ---- findByLastnameOrFirstname ---- … where x.lastname = ?1 or x.firstname = ?2；
+			Is,Equals ---- findByFirstname,findByFirstnameIs,findByFirstnameEquals ---- … where x.firstname = ?1；
+			Between ---- findByStartDateBetween ---- … where x.startDate between ?1 and ?2；
+			LessThan ---- findByAgeLessThan ---- … where x.age < ?1；
+			LessThanEqual ---- findByAgeLessThanEqual ---- … where x.age <= ?1；
+			GreaterThan ---- findByAgeGreaterThan ---- … where x.age > ?1；
+			GreaterThanEqual ---- findByAgeGreaterThanEqual ---- … where x.age >= ?1；
+			After ---- findByStartDateAfter ---- … where x.startDate > ?1；
+			Before ---- findByStartDateBefore ---- … where x.startDate < ?1；
+			IsNull ---- findByAgeIsNull ---- … where x.age is null；
+			IsNotNull,NotNull ---- findByAge(Is)NotNull ---- … where x.age not null；
+			Like ---- findByFirstnameLike ---- … where x.firstname like ?1；
+			NotLike ---- findByFirstnameNotLike ---- … where x.firstname not like ?1；
+			StartingWith ---- findByFirstnameStartingWith ---- … where x.firstname like ?1 (parameter bound with appended %)；
+			EndingWith ---- findByFirstnameEndingWith ---- … where x.firstname like ?1 (parameter bound with prepended %)；
+			Containing ---- findByFirstnameContaining ---- … where x.firstname like ?1 (parameter bound wrapped in %)；
+			OrderBy ---- findByAgeOrderByLastnameDesc ---- … where x.age = ?1 order by x.lastname desc；
+			Not ---- findByLastnameNot ---- … where x.lastname <> ?1；
+			In ---- findByAgeIn(Collection<Age> ages) ---- … where x.age in ?1；
+			NotIn ---- findByAgeNotIn(Collection<Age> ages) ---- … where x.age not in ?1；
+			True ---- findByActiveTrue() ---- … where x.active = true；
+			False ---- findByActiveFalse() ---- … where x.active = false；
+			IgnoreCase ---- findByFirstnameIgnoreCase ---- … where UPPER(x.firstame) = UPPER(?1)；
+		自定义查询
+			sql ---- select * from h_student where student_id = ?
+			hql ---- select studentId, studentName from Student where studentId = ?
+				使用 “类名” 代替 “表名”，使用 “类名.属性名” 代替 “列名”；
+				没有 * 查询；
+				传参方式
+					1、?index 的方式，index 顺序和方法参数顺序一致，从 1 开始：
+						@Query(value = "select s from Student s where s.studentName = ?1 and s.studentCard.cardId = ?2")
+			JPql ---- 实际上 hql 类似；
+
+	作业
+		jpa 实现
+			父接口查询
+			属性查询
+			自定义查询
+
+============= day_05 ===========
+持久层
+	关系型数据库：mysql、sql server、orcal
+	非关系型数据库：
+		内存性数据库：redis
+		文件形数据库：MongoDB
+Redis
+	redis 安装简介，参考笔记内容
+	步骤一：pom引入jar
+		<!-- redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!-- pool -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+	步骤二：配置
+		application.perperties
+			# for Redis
+			spring.redis.database=0
+			spring.redis.host=127.0.0.1
+			spring.redis.port=6379
+			spring.redis.password=111111
+			spring.redis.timeout=300
+
+			# for Lettuce
+			spring.redis.lettuce.pool.max-active=8
+			spring.redis.lettuce.pool.max-wait=10000
+			# 连接池中最大的空闲连接数
+			spring.redis.lettuce.pool.max-idle=8
+			# 连接池中最小连接数
+			spring.redis.lettuce.pool.min-idle=0
+			# 关闭超时时间
+			spring.redis.lettuce.shutdown-timeout=100
+		配置类 RedisConfig
+			思路
+				重写redis存储数据 key 、value 的序列化方式
+				重写缓存管理
+				重写缓存 key
+	步骤三：应用
+		封装一个工具类，RedisUtils
+			封装各种数据类型的操作，包装了类似的代码 opsFore***
+			数据操作进行异常捕获
+		service 层 || dao 层进行 redis 数据操作，其余不变；
+
+事务的处理
+	java 错误和异常
+		Throwable
+			Error
+			Exception
+				IOException
+				RunTimeException
+
+	java.lang.ArithmeticException: / by zero
+
+Thymeleaf
+	简介
+		动静结合：
+		多方言的开箱即用
+		与spring boot 的结合紧密
+	步骤一：pom引入jsr
+		<!-- thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+	步骤二：配置
+		application.properties
+			# thymeleaf
+			spring.thymeleaf.cache=false
+			spring.thymeleaf.enabled=true
+			spring.thymeleaf.encoding=UTF-8
+			spring.thymeleaf.mode=HTML5
+			spring.thymeleaf.prefix=classpath:/templates/
+			spring.thymeleaf.suffix=.html
+	步骤三：应用
+		/templates/创建前端页面
+		控制器返回页面对应的路径
+
+页面的模块化、碎片化思想
+	模块化：将业务逻辑分成不同的模块，前后端代码均按照模块来处理；
+	碎片化：
+		后台管理系统主页 ---- header.html + sidbar.html + footer.html + content.html
+		登录和注册页面 ----- 页面布局页面 + content.html
+		???????????????
+		碎片由谁来进行组装？
+		控制器返回到哪个页面？
+		碎片组装器：index.html、indexSimple.html
+		控制器包装不同页面的路劲到template变量中，返回碎片组装器，由碎片组装器组装碎片，并渲染不同的页面；
+
+Thymeleaf 标签运用
+
+作业
+	redis
+	thymeleaf
 
 
 
