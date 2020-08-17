@@ -2,6 +2,7 @@ package com.wjb.javaSpringBoot.modules.test.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.wjb.javaSpringBoot.aspect.ServiceAnnotation;
 import com.wjb.javaSpringBoot.modules.common.vo.Result;
 import com.wjb.javaSpringBoot.modules.common.vo.SearchVo;
 import com.wjb.javaSpringBoot.modules.test.dao.CityDao;
@@ -27,6 +28,7 @@ public class CityServiceImpl implements CityService {
 
     //通过国家查询改国家城市
     @Override
+    @ServiceAnnotation(value = "bbb")
     public List<City> getCitiesByCountryId(int countryId) {
 //        return cityDao.getCitiesByCountryId(countryId);
         return Optional
