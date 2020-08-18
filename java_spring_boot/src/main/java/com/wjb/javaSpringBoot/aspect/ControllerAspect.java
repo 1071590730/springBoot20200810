@@ -36,13 +36,13 @@ public class ControllerAspect {
     @Order(1)
     public void controllerPointCut() {}
 
-    //前置
+    // @Before前置
     @Before(value = "com.wjb.javaSpringBoot.aspect.ControllerAspect.controllerPointCut()")
-    public void beforeController(JoinPoint joinpoint) {
-        LOGGER.debug("==== This is before controller ====");
+    public void beforeController(JoinPoint joinpoint) {//JoinPoint切入点
+        LOGGER.debug("==== This is before controller ==aop切入==");
         ServletRequestAttributes attributes =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
+        HttpServletRequest request = attributes.getRequest();//获取request对象，和及其相关信息
         LOGGER.debug("请求来源：" + request.getRemoteAddr());
         LOGGER.debug("请求URL：" + request.getRequestURL().toString());
         LOGGER.debug("请求方式：" + request.getMethod());
@@ -52,17 +52,17 @@ public class ControllerAspect {
         LOGGER.debug("请求参数：" + Arrays.toString(joinpoint.getArgs()));
     }
 
-    //环绕
+    // @Around环绕
     @Around(value = "com.wjb.javaSpringBoot.aspect.ControllerAspect.controllerPointCut()")
     public Object aroundController(ProceedingJoinPoint proceedingJoinPoint)
             throws Throwable {
-        LOGGER.debug("==== This is around controller ==== ");
+        LOGGER.debug("==== This is around controller ==aop环绕== ");
         return proceedingJoinPoint.proceed(proceedingJoinPoint.getArgs());
     }
 
-    //结尾
+    //  @After结尾
     @After(value = "com.wjb.javaSpringBoot.aspect.ControllerAspect.controllerPointCut()")
     public void afterController() {
-        LOGGER.debug("==== This is after controller ====");
+        LOGGER.debug("==== This is after controller ==aop切出==");
     }
 }

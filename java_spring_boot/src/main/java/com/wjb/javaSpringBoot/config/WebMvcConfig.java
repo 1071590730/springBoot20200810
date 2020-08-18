@@ -19,6 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * Created by ASUS on 2020/8/11 11:32
  */
+//注释为 配置类
 @Configuration
 @AutoConfigureAfter({WebMvcAutoConfiguration.class})
 public class WebMvcConfig  implements WebMvcConfigurer {
