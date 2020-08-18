@@ -1,6 +1,7 @@
 package com.wjb.javaSpringBoot.modules.accoutnt.controller;
 
         import org.springframework.stereotype.Controller;
+        import org.springframework.ui.ModelMap;
         import org.springframework.web.bind.annotation.GetMapping;
         import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -15,7 +16,9 @@ public class AccoutntController {
      * 127.0.0.1/accoutnt/users -----get
      */
     @GetMapping("/users")
-    public String usersPage(){
+    public String usersPage(ModelMap modelMap){
+        modelMap.addAttribute("head",
+                "/upload/hhh.jpg");
         return "index";
     }
 }

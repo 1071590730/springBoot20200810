@@ -5,18 +5,25 @@ import com.wjb.javaSpringBoot.modules.test.entity.Country;
 import com.wjb.javaSpringBoot.modules.test.service.CityService;
 import com.wjb.javaSpringBoot.modules.test.service.CountryService;
 import com.wjb.javaSpringBoot.modules.test.vo.ApplicationTest;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +55,161 @@ public class TestController {
     private CountryService countryServcie;
 
     /**
+     * 127.0.0.1/test/index ---- post
+     */
+    @GetMapping("/file")
+    public ResponseEntity downloadFile(@RequestParam String fileName){
+        Resource resource = null;
+        try {
+            //资源，将本地文件夹路径置为资源路径
+            resource = new UrlResource(
+                    Paths.get("D:\\upload\\" + fileName).toUri());
+            if (resource.exists() && resource.isReadable()){
+                return ResponseEntity
+                        .ok()
+                        //响应头
+                        .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                        //下载描述
+                        .header(HttpHeaders.CONTENT_DISPOSITION,
+                                String.format("attachment; filename=\"%s\"", resource.getFilename()))
+                        .body(resource);
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 将文件以BufferedInputStream的方式读取到byte[]里面，然后用OutputStream.write输出文件
+     */
+    @RequestMapping("/download1")
+    public void downloadFile1(HttpServletRequest request,
+                              HttpServletResponse response, @RequestParam String fileName) {
+        String filePath = "D:/upload" + File.separator + fileName;
+        File downloadFile = new File(filePath);
+
+        if (downloadFile.exists()) {
+            response.setContentType("application/octet-stream");
+            response.setContentLength((int)downloadFile.length());
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                    String.format("attachment; filename=\"%s\"", fileName));
+
+            byte[] buffer = new byte[1024];
+            FileInputStream fis = null;
+            BufferedInputStream bis = null;
+            try {
+                fis = new FileInputStream(downloadFile);
+                bis = new BufferedInputStream(fis);
+                OutputStream os = response.getOutputStream();
+                int i = bis.read(buffer);
+                while (i != -1) {
+                    os.write(buffer, 0, i);
+                    i = bis.read(buffer);
+                }
+            } catch (Exception e) {
+                LOGGER.debug(e.getMessage());
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (fis != null) {
+                        fis.close();
+                    }
+                    if (bis != null) {
+                        bis.close();
+                    }
+                } catch (Exception e2) {
+                    LOGGER.debug(e2.getMessage());
+                    e2.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 以包装类 IOUtils 输出文件
+     */
+    @RequestMapping("/download2")
+    public void downloadFile2(HttpServletRequest request,
+                              HttpServletResponse response, @RequestParam String fileName) {
+        String filePath = "D:/upload" + File.separator + fileName;
+        File downloadFile = new File(filePath);
+
+        try {
+            if (downloadFile.exists()) {
+                response.setContentType("application/octet-stream");
+                response.setContentLength((int)downloadFile.length());
+                response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                        String.format("attachment; filename=\"%s\"", fileName));
+
+                InputStream is = new FileInputStream(downloadFile);
+                IOUtils.copy(is, response.getOutputStream());
+                response.flushBuffer();
+            }
+        } catch (Exception e) {
+            LOGGER.debug(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 127.0.0.1/test/index ---- post
+     */
+    //多文件上传
+    @PostMapping(value = "/files", consumes = "multipart/form-data")
+    public String uploadFiles(@RequestParam MultipartFile[] files,
+                             RedirectAttributes redirectAttributes){
+        //判断是否存在文件
+        boolean empty = true;
+        try {
+            for (MultipartFile file:
+                 files) {
+                if (file.isEmpty()){
+                    continue;
+                }
+                String destFilePath = "D:\\upload\\" + file.getOriginalFilename();
+                File destFile = new File(destFilePath);
+                file.transferTo(destFile);
+                empty = false;
+
+                if (empty){
+                    redirectAttributes.addFlashAttribute("message","请选择文件！！！");
+                }else {
+                    redirectAttributes.addFlashAttribute("message","文件上传成功。");
+                }
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("message","文件上传失败。");
+        }
+        return "redirect:/test/index";
+    }
+    /**
+     * 127.0.0.1/test/index ---- post
+     */
+//    单文件上传
+    @PostMapping(value = "/file", consumes = "multipart/form-data")
+    public String uploadFile(@RequestParam MultipartFile file,
+                             RedirectAttributes redirectAttributes){
+        if (file.isEmpty()){
+            redirectAttributes.addFlashAttribute("message","请选择文件");
+            return "redirect:/test/index";
+        }try {
+            String destFilePath = "D:\\upload\\" + file.getOriginalFilename();
+            File destFile = new File(destFilePath);
+            file.transferTo(destFile);
+            redirectAttributes.addFlashAttribute(
+                    "message", "文件上传成功。");
+        }catch (IOException e){
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute(
+                    "message", "文件上传失败。");
+        }
+
+        return "redirect:/test/index";
+    }
+
+    /**
      * 127.0.0.1/test/index
      */
     @GetMapping("/index")
@@ -70,7 +232,7 @@ public class TestController {
         modelMap.addAttribute("country", country);
         modelMap.addAttribute("cities", cities);
         modelMap.addAttribute("updateCityUri", "/api/city");
-        modelMap.addAttribute("template", "test/index");
+//        modelMap.addAttribute("template", "test/index");
         // 返回外层的碎片组装器
         return "index";
     }
