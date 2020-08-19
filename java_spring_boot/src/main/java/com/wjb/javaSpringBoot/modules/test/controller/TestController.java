@@ -55,6 +55,14 @@ public class TestController {
     private CountryService countryServcie;
 
     /**
+     * 127.0.0.1/test/indexSimple ---- get
+     */
+    @GetMapping("/indexSimple")
+    public String indexSimpleTestPage() {
+        return "indexSimple";
+    }
+
+    /**
      * 127.0.0.1/test/index ---- post
      */
     @GetMapping("/file")
@@ -65,6 +73,8 @@ public class TestController {
             resource = new UrlResource(
                     Paths.get("D:\\upload\\" + fileName).toUri());
             if (resource.exists() && resource.isReadable()){
+                //编码
+                String a = new String(fileName.getBytes("utf-8"),"ISO-8859-1");
                 return ResponseEntity
                         .ok()
                         //响应头
