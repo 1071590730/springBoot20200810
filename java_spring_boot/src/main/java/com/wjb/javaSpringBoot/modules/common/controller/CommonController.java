@@ -18,4 +18,12 @@ public class CommonController {
     public String dashboardPage() {
         return "index";
     }
+
+    /**
+     * 127.0.0.1/common/dashboard2 ---- get
+     */
+    @GetMapping("/dashboard2")
+    public String dashboard2Page() {
+        return "index";
+    }
 }

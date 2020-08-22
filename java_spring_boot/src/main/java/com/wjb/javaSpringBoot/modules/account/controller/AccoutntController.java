@@ -29,7 +29,7 @@ public class AccoutntController {
     }
 
     /**测试拦截器自动生成映射地址template
-     * 127.0.0.1/accoutnt/users -----get
+     * 127.0.0.1/account/users -----get
      */
     @GetMapping("/users")
     public String usersPage(ModelMap modelMap){

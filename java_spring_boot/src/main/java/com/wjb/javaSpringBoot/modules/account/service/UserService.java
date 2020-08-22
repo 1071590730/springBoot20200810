@@ -4,7 +4,6 @@ import com.github.pagehelper.PageInfo;
 import com.wjb.javaSpringBoot.modules.account.entity.User;
 import com.wjb.javaSpringBoot.modules.common.vo.Result;
 import com.wjb.javaSpringBoot.modules.common.vo.SearchVo;
-import com.wjb.javaSpringBoot.modules.test.entity.City;
 
 import java.util.List;
 
@@ -19,4 +18,10 @@ public interface UserService {
     Result<User> login(User user);
 
     PageInfo<User> getUsersBySearchVo(SearchVo searchVo);
+
+    Result<User> updateUser(User user);
+
+    Result<Object> deleteUser(int userId);
+
+    User getUserByUserId(int userId);
 }

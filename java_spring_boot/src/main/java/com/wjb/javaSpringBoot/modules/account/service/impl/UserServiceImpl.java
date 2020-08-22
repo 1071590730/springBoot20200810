@@ -3,6 +3,8 @@ package com.wjb.javaSpringBoot.modules.account.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.wjb.javaSpringBoot.modules.account.dao.UserDao;
+import com.wjb.javaSpringBoot.modules.account.dao.UserRoleDao;
+import com.wjb.javaSpringBoot.modules.account.entity.Role;
 import com.wjb.javaSpringBoot.modules.account.entity.User;
 import com.wjb.javaSpringBoot.modules.account.service.UserService;
 import com.wjb.javaSpringBoot.modules.common.vo.Result;
@@ -10,9 +12,11 @@ import com.wjb.javaSpringBoot.modules.common.vo.SearchVo;
 import com.wjb.javaSpringBoot.utils.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,37 +27,11 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
-/*
- //分页查询
-    @Override
-    public PageInfo<City> getCitiesBySearchVo(int countryId, SearchVo searchVo) {
-        searchVo.initSearchVo();//初始化当前页和默认值
-        PageHelper.startPage(searchVo.getCurrentPage(), searchVo.getPageSize());
-        return new PageInfo<City>(
-                Optional.ofNullable(cityDao.getCitiesByCountryId(countryId))
-                        .orElse(Collections.emptyList()));
-    }
-    //多条件查询
-    @Override
-    public PageInfo<City> getCitiesBySearchVo(SearchVo searchVo) {
-        searchVo.initSearchVo();//初始化当前页和默认值
-        PageHelper.startPage(searchVo.getCurrentPage(), searchVo.getPageSize());
-        return new PageInfo<>(
-                Optional.ofNullable(cityDao.getCitiesBySearchVo(searchVo))
-                        .orElse(Collections.emptyList()));
-    }
- */
+    @Autowired
+    private UserRoleDao userRoleDao;
 
     @Override
-    public PageInfo<User> getUsersBySearchVo(SearchVo searchVo) {
-        searchVo.initSearchVo();
-        PageHelper.startPage(searchVo.getCurrentPage(),searchVo.getPageSize());
-        return new PageInfo<User>(
-                Optional.ofNullable(userDao.getUserBySearchVo(searchVo))
-                        .orElse(Collections.emptyList()));
-    }
-
-    @Override
+    @Transactional
     public Result<User> insertUser(User user) {
         User userTemp = userDao.getUserByUserName(user.getUserName());
         if (userTemp != null) {
@@ -64,6 +42,15 @@ public class UserServiceImpl implements UserService {
         user.setCreateDate(LocalDateTime.now());
         user.setPassword(MD5Util.getMD5(user.getPassword()));
         userDao.insertUser(user);
+
+        userRoleDao.deleteUserRoleByUserId(user.getUserId());
+        List<Role> roles = user.getRoles();
+        if (roles != null && !roles.isEmpty()) {
+            roles.stream().forEach(item -> {
+                userRoleDao.insertUserRole(user.getUserId(), item.getRoleId());
+            });
+        }
+
         return new Result<User>(
                 Result.ResultStatus.SUCCESS.status, "Insert success.", user);
     }
@@ -78,5 +65,50 @@ public class UserServiceImpl implements UserService {
 
         return new Result<User>(Result.ResultStatus.FAILD.status,
                 "UserName or password is error.");
+    }
+
+    @Override
+    public PageInfo<User> getUsersBySearchVo(SearchVo searchVo) {
+        searchVo.initSearchVo();
+        PageHelper.startPage(searchVo.getCurrentPage(), searchVo.getPageSize());
+        return new PageInfo<User>(
+                Optional.ofNullable(userDao.getUsersBySearchVo(searchVo))
+                        .orElse(Collections.emptyList()));
+    }
+
+    @Override
+    @Transactional
+    public Result<User> updateUser(User user) {
+        User userTemp = userDao.getUserByUserName(user.getUserName());
+        if (userTemp != null && userTemp.getUserId() != user.getUserId()) {
+            return new Result<User>(
+                    Result.ResultStatus.FAILD.status, "User name is repeat.");
+        }
+
+        userDao.updateUser(user);
+
+        userRoleDao.deleteUserRoleByUserId(user.getUserId());
+        List<Role> roles = user.getRoles();
+        if (roles != null && !roles.isEmpty()) {
+            roles.stream().forEach(item -> {
+                userRoleDao.insertUserRole(user.getUserId(), item.getRoleId());
+            });
+        }
+
+        return new Result<User>(
+                Result.ResultStatus.SUCCESS.status, "Update success.", user);
+    }
+
+    @Override
+    @Transactional
+    public Result<Object> deleteUser(int userId) {
+        userDao.deleteUser(userId);
+        userRoleDao.deleteUserRoleByUserId(userId);
+        return new Result<>(Result.ResultStatus.SUCCESS.status, "Delete success.");
+    }
+
+    @Override
+    public User getUserByUserId(int userId) {
+        return userDao.getUserByUserId(userId);
     }
 }
