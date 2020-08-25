@@ -1,18 +1,24 @@
 package com.wjb.javaSpringBoot.modules.account.service.impl;
-
-import com.wjb.javaSpringBoot.modules.account.dao.RoleDao;
-import com.wjb.javaSpringBoot.modules.account.entity.Role;
-import com.wjb.javaSpringBoot.modules.account.service.RoleService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+/**
+ * Created by ASUS on 2020/8/22 21:57
+ */
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by ASUS on 2020/8/22 21:57
- */
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.wjb.javaSpringBoot.modules.account.dao.RoleDao;
+import com.wjb.javaSpringBoot.modules.account.entity.Role;
+import com.wjb.javaSpringBoot.modules.account.service.RoleService;
+import com.wjb.javaSpringBoot.modules.common.vo.Result;
+import com.wjb.javaSpringBoot.modules.common.vo.Result.ResultStatus;
+import com.wjb.javaSpringBoot.modules.common.vo.SearchVo;
+
 @Service
 public class RoleServiceImpl implements RoleService {
 
@@ -21,7 +27,56 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Role> getRoles() {
-        return Optional.ofNullable(roleDao.getRoles())
-                .orElse(Collections.emptyList());
+        return Optional.ofNullable(roleDao.getRoles()).orElse(Collections.emptyList());
     }
+
+    @Override
+    @Transactional
+    public Result<Role> editRole(Role role) {
+        Role roleTemp = roleDao.getRoleByRoleName(role.getRoleName());
+        if (roleTemp != null && roleTemp.getRoleId() != role.getRoleId()) {
+            return new Result<Role>(ResultStatus.FAILD.status, "Role name is repeat.");
+        }
+
+        if (role.getRoleId() > 0) {
+            roleDao.updateRole(role);
+        } else {
+            roleDao.addRole(role);
+        }
+
+        return new Result<Role>(ResultStatus.SUCCESS.status, "success", role);
+    }
+
+    @Override
+    @Transactional
+    public Result<Role> deleteRole(int roleId) {
+        roleDao.deleteRole(roleId);
+        return new Result<Role>(ResultStatus.SUCCESS.status, "");
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public PageInfo<Role> getRoles(SearchVo searchVo) {
+        searchVo.initSearchVo();
+        PageHelper.startPage(searchVo.getCurrentPage(), searchVo.getPageSize());
+        return new PageInfo(
+                Optional.ofNullable(roleDao.getRolesBySearchVo(searchVo))
+                        .orElse(Collections.emptyList()));
+    }
+
+    @Override
+    public List<Role> getRolesByUserId(int userId) {
+        return roleDao.getRolesByUserId(userId);
+    }
+
+    @Override
+    public List<Role> getRolesByResourceId(int resourceId) {
+        return roleDao.getRolesByResourceId(resourceId);
+    }
+
+    @Override
+    public Role getRoleById(int roleId) {
+        return roleDao.getRoleById(roleId);
+    }
+
 }

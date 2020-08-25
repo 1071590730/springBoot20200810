@@ -2,7 +2,6 @@ package com.wjb.javaSpringBoot.config;
 
 import com.wjb.javaSpringBoot.filter.RequestParameFilter;
 import com.wjb.javaSpringBoot.interceptor.RequestViewInterceptor;
-import jdk.nashorn.internal.ir.ReturnNode;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +12,10 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -29,6 +31,8 @@ public class WebMvcConfig  implements WebMvcConfigurer {
     //注释 自定义的拦截器
     @Autowired
     private RequestViewInterceptor requestViewInterceptor;
+    @Autowired
+    private ResourceConfigBean resourceConfigBean;
 
     @Bean
     public Connector connector() {
@@ -62,4 +66,26 @@ public class WebMvcConfig  implements WebMvcConfigurer {
         //registry.addInterceptor()置为拦截器，并拦截所有("/**")
         registry.addInterceptor(requestViewInterceptor).addPathPatterns("/**");
     }
+
+
+    //添加本地资源文件
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String osName = System.getProperty("os.name");//获取操作系统名字
+        if (osName.startsWith("win")) {//判断如果是以“win”开通，为Windows系统
+            registry.addResourceHandler(resourceConfigBean.getRelativePathPattern())
+                    .addResourceLocations(ResourceUtils.FILE_URL_PREFIX +
+                            resourceConfigBean.getLocationPathForWindows());
+        } else {//linx
+            registry.addResourceHandler(resourceConfigBean.getRelativePathPattern())
+                    .addResourceLocations(ResourceUtils.FILE_URL_PREFIX +
+                            resourceConfigBean.getLocationPathForLinux());
+        }
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("wellcome");
+    }
+
 }

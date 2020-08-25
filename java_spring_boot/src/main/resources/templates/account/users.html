@@ -86,8 +86,11 @@
 <script src="/plugin/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
 
 <script type="text/javascript">
+    //默认显示条数常量
     var DEFAULT_PAGE_SIZE = 5;
+    // 加载页面调用的方法
     $(document).ready(function() {
+        //默认值
         initUserTable(DEFAULT_PAGE_SIZE);
 
         $("#addUserBtn").bind("click", function() {
@@ -102,20 +105,21 @@
             editUser();
         });
     });
-
+    // 进入页面时调用的方法
     function initUserTable(pageSize) {
+        //渲染页面table id="datatable"
         $('#datatable').DataTable({
             'paging': true, //分页
             "serverSide": true, //开启后端分页
             "pagingType": "full_numbers", //分页样式的类型simple/simple_numbers/full/full_numbers
             "pageLength": pageSize, //定义初始的页长
-            "processing": true,
+            "processing": true,//加载数据过长时，等待的图标
             "destroy": true, //允许销毁替换，在表格重新查询时，可以自动销毁以前的data
             'lengthChange': true, //控制是否能够调整每页的条数
-            'searching': true,
-            'data-show-refresh': true,
-            'ordering': true,
-            'autoWidth': false,
+            'searching': true,//search
+            'data-show-refresh': true,//增删改时刷新表
+            'ordering': true,//表头排序显示
+            'autoWidth': false,//每一列的宽自动设置
             "ajax": function (data, callback, settings) {
                 // 从data获取查询数据
                 var columIndex = data.order[0].column;
@@ -173,6 +177,7 @@
                 });
             },
             "columns": [ //定义行数据字段
+                //{data: '属性', name: "对应数据库列明(用于排序)", sortable: 是否支持排序},
                 {data: 'userId', name: "user_id", sortable: true},
                 {data: 'userName', name: "user_name", sortable: true},
                 {data: 'password', name: "password", sortable: true},

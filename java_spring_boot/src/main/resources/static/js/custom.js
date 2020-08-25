@@ -5039,6 +5039,8 @@ $(document).ready(function () {
 });
 
 // ----------------------------
+var DEFAULT_PAGE_SIZE = 5;
+
 function initRoles(rolesDivId, roleElementName) {
     $.ajax({
         url : "/api/roles",
