@@ -73,27 +73,24 @@ public class UserServiceImpl implements UserService {
 //            return new Result<>(Result.ResultStatus.SUCCESS.status, "Success.", userTemp);
 //        }
 //        return new Result<User>(Result.ResultStatus.FAILD.status, "UserName or password is error.");
-
         Subject subject = SecurityUtils.getSubject();
 
         UsernamePasswordToken usernamePasswordToken =
-                new UsernamePasswordToken(user.getUserName(),
-                        MD5Util.getMD5(user.getPassword()));//账号密码令牌
+                new UsernamePasswordToken(user.getAccountName(),
+                        MD5Util.getMD5(user.getPassword()));//获取登陆账号密码做令牌
         usernamePasswordToken.setRememberMe(user.getRememberMe());//记住密码选中
 
         try {
             subject.login(usernamePasswordToken);//调用登陆方法，传入令牌（账号、密码）
-//            subject.checkRoles();
+            subject.checkRoles();
         } catch (Exception e) {
             e.printStackTrace();
             return new Result<User>(Result.ResultStatus.FAILD.status,
                     "UserName or password is error.");
         }
 
-//        return new Result<User>(Result.ResultStatus.FAILD.status,
-//                "UserName or password is error.");
-//        Session session = subject.getSession();
-//        session.setAttribute("user", (User)subject.getPrincipal());
+        Session session = subject.getSession();
+        session.setAttribute("user", (User)subject.getPrincipal());
 
         return new Result<User>(Result.ResultStatus.SUCCESS.status,
                 "Login success.", user);

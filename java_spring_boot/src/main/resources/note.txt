@@ -499,6 +499,375 @@ Thymeleaf 标签运用
 	# 配置某个端点开启或关闭
 	management.endpoint.shutdown.enabled=true
 
+============= day_08 ===========
+计算机编码
+	编码是个令人头疼的问题！
+	ASCII
+	计算机只能处理数字，文本或其他内容，首先要转化为数字；
+	计算机采用8个bit（bit）作为一个字节（byte），一个字节表示的最大整数是255（二进制的 8bit 最大为11111111，转化为十进制 255），想要表示更大的整数，就必须用多个字节，两个字节可以表示的最大整数是 65535，4 个字节可以表示的最大整数是 4294967295；
+	最早只有128（0-127）个符号编到计算机里（大小写英文字母、数字和一些符号），这个编码表被称为 ASCII 编码，比如大写字母 A 的编码是 65，小写字母 z 的编码是 122；
+	各国指定了各自的编码规范：中国（GB2312）、日本（Shift_JIS）、韩国（Euc-kr）……世界上有上百种语言，每种规范还不能和ASCII冲突，将这些规范混在文本中，乱码就产生了；
+	Iso-8859-1
+	单字节编码，和 Ascii 编码相似，最多能表示的字符范围是 0-255，应用于英文系列，很明显，iso-8859-1 编码表示的字符范围很窄，无法表示中文字符，但是，由于是单字节编码，和计算机最基础的表示单位一致，所以很多时候，仍旧使用 iso-8859-1 编码来表示，而且在很多协议上，默认使用该编码；
+	Unicode
+	为了解决乱码问题，Unicode应运而生，Unicode把所有语言都统一到一套编码里，这样就不会再有乱码问题了，但是，ASCII编码是1个字节，而Unicode编码通常是2个字节，在存储和传输上就十分不划算；
+	UTF-8
+	为了解决Unicode存储空间的问题，又出现了把Unicode编码转化为“可变长编码”的UTF-8编码，UTF-8编码把一个Unicode字符根据不同的数字大小编码成1-6个字节，常用的英文字母被编码成1个字节，汉字通常是3个字节，只有很生僻的字符才会被编码成4-6个字节，如果你要传输的文本包含大量英文字符，用UTF-8编码就能节省空间；
+	UTF-8编码有一个额外的好处，就是ASCII编码实际上可以被看成是UTF-8编码的一部分，所以，大量只支持ASCII编码的历史遗留软件可以在UTF-8编码下继续工作；
+	在计算机内存中，统一使用Unicode编码，当需要保存到硬盘或者需要传输的时候，就转换为UTF-8编码；
+	Base64
+	Base64就是一种基于64个可打印字符来表示二进制数据的方法，要求把每三个8Bit的字节转换为四个6Bit的字节（3*8 = 4*6 = 24），然后把6Bit再添两位高位0，组成四个8Bit的字节，也就是说，转换后的字符串理论上将要比原来的长1/3；
+	使用场景
+	电子邮件中不能直接使用非ASCII码字符传输数据，所以使用base64进行编码后传输，因为base64的64个字符肯定有对应的ascii编码；
+	保存图片：图片数据归根到底还是一堆二进制串，用base64编码后的显示成的字符串可以存到数据库；
+	请不要再叫base64加密，请叫base64编码；
+
+	页面模板的拆解
+		两个碎片组装器
+
+============= day_09 ===========
+ajax
+	是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术；
+	参数
+	async：默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false；
+	beforeSend(XHR)：发送请求前可修改 XMLHttpRequest 对象的函数，如添加自定义 HTTP 头；
+	cache：默认值: true，dataType 为 script 和 jsonp 时默认为 false。设置为 false 将不缓存此页面；
+	complete(XHR, TS)：参数： XMLHttpRequest 对象和一个描述请求类型的字符串；
+	contentType：默认值: "application/x-www-form-urlencoded"。发送信息至服务器时内容编码类型；
+	context：这个对象用于设置 Ajax 相关回调函数的上下文；
+	data：发送到服务器的数据；
+	dataFilter：给 Ajax 返回的原始数据的进行预处理的函数；
+	dataType：预期服务器返回的数据类型；
+	"xml": 返回 XML 文档，可用 jQuery 处理；
+	"html": 返回纯文本 HTML 信息；包含的 script 标签会在插入 dom 时执行；
+	"script": 返回纯文本 JavaScript 代码。不会自动缓存结果。除非设置了 "cache" 参数；
+	"json": 返回 JSON 数据；
+	"jsonp": JSONP 格式。使用 JSONP 形式调用函数时，如 "myurl?callback=?" jQuery 将自动替换 ? 为正确的函数名，以执行回调函数；
+	"text": 返回纯文本字符串；
+	error
+	自动判断 (xml 或 html)。请求失败时调用此函数；
+	global：是否触发全局 AJAX 事件；
+	success：请求成功后的回调函数；
+	======================================
+	// json提交
+	var resource = {};
+	resource.resourceName = $("[name=resourceName]").val();
+	resource.resourceUrl = $("[name=resourceUrl]").val();
+	resource.resourceDescription = $("[name=resourceDescription]").val();
+	var roles = new Array();
+	$.each($("input[name='roleCheckbox']"), function(){
+		if(this.checked){
+			var role = {};
+			role.roleId = $(this).val();
+			roles.push(role);
+		}
+	});
+	resource.roles = roles;
+	var user = {};
+	user.account = $("[name='account']").val();
+	user.password = $("[name='password']").val();
+	user.rememberMe = $("[name='rememberMe']").prop('checked');
+	$.ajax({
+		url : "/doLogin",
+		type : "post",
+		contentType: "application/json",
+		data : JSON.stringify(user),
+		success : function (data) {
+			if (data.status == 200) {
+				location.href = "/index";
+			} else {
+				layer.msg(data.message, {icon: 0});
+			}
+		},
+		error : function (data) {
+			layer.msg(data.responseText, {icon: 0});
+		}
+	});
+	// form提交
+	$.ajax({
+		url :"/organization/addDepartment",
+		type : "POST",
+		data : $('#form1').serialize(),
+		dataType : "text",
+		success : function(data) {
+			var result = eval("(" + data + ")");
+			if (result.status == 200) {
+				layer.msg("修改成功",{
+					icon : 1,
+					time: 500,
+				},function () {
+					var index = parent.layer.getFrameIndex(window.name);
+					parent.location.reload();
+					parent.layer.close(index);
+				});
+			} else {
+				layer.msg(result.message, {icon: 0});
+			}
+		},
+			error : function() {
+				layer.msg('无法连接服务器', {icon: 2});
+			}
+		});
+		return false;
+	});
+
+
+
+登录、注册页面
+	后台：dao ---- service ---- controller ----- 接口测试
+	前端：页面 ---- js
+	-------------------------
+	/account/login ---- 登录页面
+	/account/register ---- 注册页面
+	/api/user ---- post
+	/api/login ---- post
+	/api/users ---- post
+	/api/user ---- put
+	/api/user/{userId} ---- get
+	/api/user/{userId} ---- delete
+
+============= day_10 ===========
+============= day_11 ===========
+table 页
+	开发 table 页后台接口
+		dao ---- service ---- controller ---- 接口测试
+	书写 table 页
+		页面伪代码 ---- 页面跳转控制器 ---- 保证页面跳转okay
+	table 页的功能点
+		表格渲染
+			html 从模版拷贝
+			jquery datatable
+				ajax 属性配置 "ajax": function (data, callback, settings)
+					data包装表格数据，通过浏览器页面js调试，获取data属性 ---- 分页起始index、排序、关键字查询等信息 ----- 包装 searchvo 对象
+					callback 回调函数，将表格数据传入，渲染表格
+				自定义 ajax ---- 请求后台接口，返回数据
+					定义2种数据结构：行数据结构（要显示的列 + 操作列）、表格数据结构（数据count、当前页需要显示的list（包装的行数据结构））
+			测试：分页、keyword查询、排序
+		新增
+			bootstrap 模态框
+				button || a 等 ---- data-toggle="modal" data-target="#addUserModal"
+				模态框的 div ---- header + body + footer
+			事件驱动
+				点击新增按钮 ---- 初始化模态框的值（置空intput框 + 初始化 roles checkbox）
+				模态框上点击save changes ---- 获取模态框表单输入的值，ajax 提交后台接口 新增 ---- 关闭模态框 ---- 重新渲染 table
+		修改
+			事件驱动
+				操作列 update a标签 ---- 打开模态框、初始化模态框数据（当前 userId 获取 user 数据，渲染到模态框上）
+				模态框上 save changes 按钮 ---- 获取模态框表单输入的值，ajax 提交后台接口 修改 ---- 关闭模态框 ---- 重新渲染 table
+		删除
+			事件驱动
+				点击操作列上 删除 a标签 ---- 调用 js 函数，删除当前user ---- 重新渲染 table
+
+profile 页面
+	静态资源文件配置
+		步骤一：pom导入jar ---- 无需导入新的jar
+		步骤二配置：配置
+			application.properties
+				# spring local resource config
+				# 应用指定的 “相对路径”
+				spring.resource.path=/upload/
+				spring.resource.path.pattern=/upload/**
+				# 本地指定的 “绝对路径”，和相对路径映射
+				spring.resource.folder.windows=d:/upload/
+				spring.resource.folder.linux=/upload/
+			配置类 WebMvcConfig implements WebMvcConfigurer
+				重写 addResourceHandlers 方法
+		步骤三：应用并测试
+			使用 test 模块 上传文件进行测试
+
+	准备 profile 页面
+
+============= day_12 ===========
+shiro
+	身份验证过程
+		用户登录 ---- 包装令牌（用户名、密码、记住我） ---- subject 调用 realm，包装身份验证器 ---- 身份验证器和令牌做比对（用户名和密码的比对）
+	资源授权流程
+		用户登录 ----- subject调用 checkroles（） ---- 跳转页面 ---- 当页面有 shiro 标签 或者方法上有 shiro 注解时候 ---- 调用 realm 里面的资源授权器 ---- 资源授权器和标签或注解上的内容做比对
+============= day_08 ===========
+计算机编码
+	编码是个令人头疼的问题！
+	ASCII
+	计算机只能处理数字，文本或其他内容，首先要转化为数字；
+	计算机采用8个bit（bit）作为一个字节（byte），一个字节表示的最大整数是255（二进制的 8bit 最大为11111111，转化为十进制 255），想要表示更大的整数，就必须用多个字节，两个字节可以表示的最大整数是 65535，4 个字节可以表示的最大整数是 4294967295；
+	最早只有128（0-127）个符号编到计算机里（大小写英文字母、数字和一些符号），这个编码表被称为 ASCII 编码，比如大写字母 A 的编码是 65，小写字母 z 的编码是 122；
+	各国指定了各自的编码规范：中国（GB2312）、日本（Shift_JIS）、韩国（Euc-kr）……世界上有上百种语言，每种规范还不能和ASCII冲突，将这些规范混在文本中，乱码就产生了；
+	Iso-8859-1
+	单字节编码，和 Ascii 编码相似，最多能表示的字符范围是 0-255，应用于英文系列，很明显，iso-8859-1 编码表示的字符范围很窄，无法表示中文字符，但是，由于是单字节编码，和计算机最基础的表示单位一致，所以很多时候，仍旧使用 iso-8859-1 编码来表示，而且在很多协议上，默认使用该编码；
+	Unicode
+	为了解决乱码问题，Unicode应运而生，Unicode把所有语言都统一到一套编码里，这样就不会再有乱码问题了，但是，ASCII编码是1个字节，而Unicode编码通常是2个字节，在存储和传输上就十分不划算；
+	UTF-8
+	为了解决Unicode存储空间的问题，又出现了把Unicode编码转化为“可变长编码”的UTF-8编码，UTF-8编码把一个Unicode字符根据不同的数字大小编码成1-6个字节，常用的英文字母被编码成1个字节，汉字通常是3个字节，只有很生僻的字符才会被编码成4-6个字节，如果你要传输的文本包含大量英文字符，用UTF-8编码就能节省空间；
+	UTF-8编码有一个额外的好处，就是ASCII编码实际上可以被看成是UTF-8编码的一部分，所以，大量只支持ASCII编码的历史遗留软件可以在UTF-8编码下继续工作；
+	在计算机内存中，统一使用Unicode编码，当需要保存到硬盘或者需要传输的时候，就转换为UTF-8编码；
+	Base64
+	Base64就是一种基于64个可打印字符来表示二进制数据的方法，要求把每三个8Bit的字节转换为四个6Bit的字节（3*8 = 4*6 = 24），然后把6Bit再添两位高位0，组成四个8Bit的字节，也就是说，转换后的字符串理论上将要比原来的长1/3；
+	使用场景
+	电子邮件中不能直接使用非ASCII码字符传输数据，所以使用base64进行编码后传输，因为base64的64个字符肯定有对应的ascii编码；
+	保存图片：图片数据归根到底还是一堆二进制串，用base64编码后的显示成的字符串可以存到数据库；
+	请不要再叫base64加密，请叫base64编码；
+
+	页面模板的拆解
+		两个碎片组装器
+
+============= day_09 ===========
+ajax
+	是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术；
+	参数
+	async：默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false；
+	beforeSend(XHR)：发送请求前可修改 XMLHttpRequest 对象的函数，如添加自定义 HTTP 头；
+	cache：默认值: true，dataType 为 script 和 jsonp 时默认为 false。设置为 false 将不缓存此页面；
+	complete(XHR, TS)：参数： XMLHttpRequest 对象和一个描述请求类型的字符串；
+	contentType：默认值: "application/x-www-form-urlencoded"。发送信息至服务器时内容编码类型；
+	context：这个对象用于设置 Ajax 相关回调函数的上下文；
+	data：发送到服务器的数据；
+	dataFilter：给 Ajax 返回的原始数据的进行预处理的函数；
+	dataType：预期服务器返回的数据类型；
+	"xml": 返回 XML 文档，可用 jQuery 处理；
+	"html": 返回纯文本 HTML 信息；包含的 script 标签会在插入 dom 时执行；
+	"script": 返回纯文本 JavaScript 代码。不会自动缓存结果。除非设置了 "cache" 参数；
+	"json": 返回 JSON 数据；
+	"jsonp": JSONP 格式。使用 JSONP 形式调用函数时，如 "myurl?callback=?" jQuery 将自动替换 ? 为正确的函数名，以执行回调函数；
+	"text": 返回纯文本字符串；
+	error
+	自动判断 (xml 或 html)。请求失败时调用此函数；
+	global：是否触发全局 AJAX 事件；
+	success：请求成功后的回调函数；
+	======================================
+	// json提交
+	var resource = {};
+	resource.resourceName = $("[name=resourceName]").val();
+	resource.resourceUrl = $("[name=resourceUrl]").val();
+	resource.resourceDescription = $("[name=resourceDescription]").val();
+	var roles = new Array();
+	$.each($("input[name='roleCheckbox']"), function(){
+		if(this.checked){
+			var role = {};
+			role.roleId = $(this).val();
+			roles.push(role);
+		}
+	});
+	resource.roles = roles;
+	var user = {};
+	user.account = $("[name='account']").val();
+	user.password = $("[name='password']").val();
+	user.rememberMe = $("[name='rememberMe']").prop('checked');
+	$.ajax({
+		url : "/doLogin",
+		type : "post",
+		contentType: "application/json",
+		data : JSON.stringify(user),
+		success : function (data) {
+			if (data.status == 200) {
+				location.href = "/index";
+			} else {
+				layer.msg(data.message, {icon: 0});
+			}
+		},
+		error : function (data) {
+			layer.msg(data.responseText, {icon: 0});
+		}
+	});
+	// form提交
+	$.ajax({
+		url :"/organization/addDepartment",
+		type : "POST",
+		data : $('#form1').serialize(),
+		dataType : "text",
+		success : function(data) {
+			var result = eval("(" + data + ")");
+			if (result.status == 200) {
+				layer.msg("修改成功",{
+					icon : 1,
+					time: 500,
+				},function () {
+					var index = parent.layer.getFrameIndex(window.name);
+					parent.location.reload();
+					parent.layer.close(index);
+				});
+			} else {
+				layer.msg(result.message, {icon: 0});
+			}
+		},
+			error : function() {
+				layer.msg('无法连接服务器', {icon: 2});
+			}
+		});
+		return false;
+	});
+
+
+
+登录、注册页面
+	后台：dao ---- service ---- controller ----- 接口测试
+	前端：页面 ---- js
+	-------------------------
+	/account/login ---- 登录页面
+	/account/register ---- 注册页面
+	/api/user ---- post
+	/api/login ---- post
+	/api/users ---- post
+	/api/user ---- put
+	/api/user/{userId} ---- get
+	/api/user/{userId} ---- delete
+
+============= day_10 ===========
+
+============= day_11 ===========
+table 页
+	开发 table 页后台接口
+		dao ---- service ---- controller ---- 接口测试
+	书写 table 页
+		页面伪代码 ---- 页面跳转控制器 ---- 保证页面跳转okay
+	table 页的功能点
+		表格渲染
+			html 从模版拷贝
+			jquery datatable
+				ajax 属性配置 "ajax": function (data, callback, settings)
+					data包装表格数据，通过浏览器页面js调试，获取data属性 ---- 分页起始index、排序、关键字查询等信息 ----- 包装 searchvo 对象
+					callback 回调函数，将表格数据传入，渲染表格
+				自定义 ajax ---- 请求后台接口，返回数据
+					定义2种数据结构：行数据结构（要显示的列 + 操作列）、表格数据结构（数据count、当前页需要显示的list（包装的行数据结构））
+			测试：分页、keyword查询、排序
+		新增
+			bootstrap 模态框
+				button || a 等 ---- data-toggle="modal" data-target="#addUserModal"
+				模态框的 div ---- header + body + footer
+			事件驱动
+				点击新增按钮 ---- 初始化模态框的值（置空intput框 + 初始化 roles checkbox）
+				模态框上点击save changes ---- 获取模态框表单输入的值，ajax 提交后台接口 新增 ---- 关闭模态框 ---- 重新渲染 table
+		修改
+			事件驱动
+				操作列 update a标签 ---- 打开模态框、初始化模态框数据（当前 userId 获取 user 数据，渲染到模态框上）
+				模态框上 save changes 按钮 ---- 获取模态框表单输入的值，ajax 提交后台接口 修改 ---- 关闭模态框 ---- 重新渲染 table
+		删除
+			事件驱动
+				点击操作列上 删除 a标签 ---- 调用 js 函数，删除当前user ---- 重新渲染 table
+
+profile 页面
+	静态资源文件配置
+		步骤一：pom导入jar ---- 无需导入新的jar
+		步骤二配置：配置
+			application.properties
+				# spring local resource config
+				# 应用指定的 “相对路径”
+				spring.resource.path=/upload/
+				spring.resource.path.pattern=/upload/**
+				# 本地指定的 “绝对路径”，和相对路径映射
+				spring.resource.folder.windows=d:/upload/
+				spring.resource.folder.linux=/upload/
+			配置类 WebMvcConfig implements WebMvcConfigurer
+				重写 addResourceHandlers 方法
+		步骤三：应用并测试
+			使用 test 模块 上传文件进行测试
+
+	准备 profile 页面
+
+============= day_12 ===========
+shiro
+	身份验证过程
+		用户登录 ---- 包装令牌（用户名、密码、记住我） ---- subject 调用 realm，包装身份验证器 ---- 身份验证器和令牌做比对（用户名和密码的比对）
+	资源授权流程
+		用户登录 ----- subject调用 checkroles（） ---- 跳转页面 ---- 当页面有 shiro 标签 或者方法上有 shiro 注解时候 ---- 调用 realm 里面的资源授权器 ---- 资源授权器和标签或注解上的内容做比对
 
 
 

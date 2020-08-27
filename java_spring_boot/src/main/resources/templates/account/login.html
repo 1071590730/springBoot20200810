@@ -4,8 +4,8 @@
             <form action="javascript:void(0);">
                 <h1>*** Manager System</h1>
                 <div>
-                    <input name="userName" type="text" class="form-control"
-                           placeholder="Username" required="" />
+                    <input name="accountName" type="text" class="form-control"
+                           placeholder="accountName" required="" />
                 </div>
                 <div>
                     <input name="password" type="password" class="form-control"
@@ -62,16 +62,16 @@
         var code = $(".input-val").val();
         var num = show_num.join("");
         //验证码认证
-        if (code == "") {
-            layer.msg("Please input Verification Code.", {icon: 0});
-            return;
-        } else if (code != num) {
-            layer.msg("The input code is error.", {icon: 0});
-            return;
-        };
+        // if (code == "") {
+        //     layer.msg("Please input Verification Code.", {icon: 0});
+        //     return;
+        // } else if (code != num) {
+        //     layer.msg("The input code is error.", {icon: 0});
+        //     return;
+        // };
 
         var user = {};
-        user.userName = $("[name=userName]").val();
+        user.accountName = $("[name=accountName]").val();
         user.password = $("[name=password]").val();
         user.rememberMe = $("[name=rememberMe]").prop("checked")
 

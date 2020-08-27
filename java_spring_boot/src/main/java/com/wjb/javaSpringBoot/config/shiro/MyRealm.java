@@ -43,7 +43,7 @@ public class MyRealm extends AuthorizingRealm {
                 }
             });
         }
-
+        //返回资源授权器
         return simpleAuthorizationInfo;
     }
 
@@ -57,7 +57,7 @@ public class MyRealm extends AuthorizingRealm {
         if (user == null) {
             throw new UnknownAccountException("用户不存在。");
         }
-        //返回（用户，用户密码，用户名(唯一标识)）
+        //返回身份认证器（用户，用户密码，用户名(唯一标识)）
         return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
     }
 }
