@@ -9,7 +9,7 @@
 		B、外置：xx.jar同目录下/config/application.yml；
 		C、内置：src/main/resources/config；
 		D、内置：src/main/resources
-	以下log日志级别哪个最高（ A ）
+	以下log日志级别哪个最高（ D ）
 		A、DEBUG
 		B、INFO
 		C、WARN
