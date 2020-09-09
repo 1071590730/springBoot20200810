@@ -339,6 +339,7 @@
         // initUserProfile(2);
         // initUserProfile($("#userId").val());
         initUserProfile($("#userId").html());
+        alert($("#userId").html())
         
         $("#editProfile").bind("click", function(){
             editProfile();
@@ -355,7 +356,7 @@
                 $("[name='userId']").val(rs.userId);
                 $("[name='userName']").val(rs.userName);
                 if (rs.userImg == null) {
-                    $("#userImgForProfile").attr("src", "/images/picture.jpg");
+                    $("#userImgForProfile").attr("src", "/images/img.jpg");
                 } else {
                     $("#userImgForProfile").attr("src", rs.userImg);
                 }

@@ -42,6 +42,11 @@ public class WebMvcConfig  implements WebMvcConfigurer {
         return connector;
     }
 
+    /**
+     * 1、重新注册ServletWebServerFactory bean
+     * 2、以TomcatServletWebServerFactory实现，添加http连接器
+     * @return
+     */
     @Bean
     public ServletWebServerFactory webServerFactory() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
