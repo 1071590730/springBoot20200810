@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setCreateDate(LocalDateTime.now());
-        user.setPassword(MD5Util.getMD5(user.getPassword()));
+        user.setPassword(MD5Util.getMD5(user.getPassword()));//MD5加密
         userDao.insertUser(user);
 
         userRoleDao.deleteUserRoleByUserId(user.getUserId());
