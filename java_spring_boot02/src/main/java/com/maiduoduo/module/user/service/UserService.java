@@ -13,7 +13,12 @@ public interface UserService {
 
     boolean isUsernameUsable(String username);
 
-    boolean updateStatusById(User user);
+//    boolean updateStatusById(User user);
 
     User findUserByUsername(String username);
+
+    void active(Long id);
+
+    User findUserByUserId(Long userId);
+
 }

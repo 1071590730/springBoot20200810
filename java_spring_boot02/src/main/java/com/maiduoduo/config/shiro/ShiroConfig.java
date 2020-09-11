@@ -1,5 +1,6 @@
 package com.maiduoduo.config.shiro;
 
+import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -8,9 +9,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+
 /**
- * @Author lykgogo
- * @Date 2020/9/10 09:07
+ *wang
  */
 
 @Configuration
@@ -21,6 +23,29 @@ public class ShiroConfig {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
 
         factoryBean.setSecurityManager(securityManager);
+
+        HashMap<String, String> map = new HashMap<>();
+
+        /*
+        authc:代表必须要认证过后才能访问
+        anon:代表不需要认证就可以访问
+         */
+        map.put("/user/toLogin", "anon");
+        map.put("/user/login", "anon");
+        map.put("/user/toRegister", "anon");
+        map.put("/user/register", "anon");
+        map.put("/user/isUsernameUsable", "anon");
+        map.put("/user/active/**", "anon");
+        map.put("/css/**", "anon");
+        map.put("/js/**", "anon");
+        map.put("/fonts/**", "anon");
+        map.put("/img/**", "anon");
+
+        map.put("/**","authc");
+
+        factoryBean.setFilterChainDefinitionMap(map);
+        factoryBean.setLoginUrl("/user/toLogin");
+
         return factoryBean;
     }
 
@@ -49,4 +74,11 @@ public class ShiroConfig {
 
     }
 
+    /*
+     * 配置shiro thymeleaf 标签
+     */
+    @Bean
+    public ShiroDialect getShiroDialect() {
+        return new ShiroDialect();
+    }
 }

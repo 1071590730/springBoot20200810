@@ -59,18 +59,24 @@ public class UserController {
         return map;
     }
 
+//    @GetMapping("/active/{id}")
+//    @ResponseBody
+//    public String active(@PathVariable Long id) {
+//        User user = new User();
+//        user.setUser_id(id);
+//        user.setStatus(1);
+//        boolean flag = userService.updateStatusById(user);
+//        if (flag){
+//            return "<a href='http://localhost:8888/user/toLogin/'>激活成功，点击此链接登陆账户。</a>";
+//        }else {
+//            return "激活失败！！！";
+//        }
+//    }
     @GetMapping("/active/{id}")
-    @ResponseBody
-    public String active(@PathVariable Long id) {
-        User user = new User();
-        user.setUser_id(id);
-        user.setStatus(1);
-        boolean flag = userService.updateStatusById(user);
-        if (flag){
-            return "<a href='http://localhost:8888/user/toLogin/'>激活成功，点击此链接登陆账户。</a>";
-        }else {
-            return "激活失败！！！";
-        }
+    public String active(@PathVariable Long id){
+        userService.active(id);
+
+        return "user/active_success";
     }
 
     @PostMapping("login")

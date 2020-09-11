@@ -1,11 +1,13 @@
 package com.maiduoduo.module.user.entity;
 
+import com.maiduoduo.module.role.entity.Role;
 import lombok.Data;
 import tk.mybatis.mapper.annotation.KeySql;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Author lykgogo
@@ -18,7 +20,7 @@ public class User implements Serializable {
 
     @Id
     @KeySql(useGeneratedKeys = true)//回传id
-    private Long user_id;
+    private Long userId;
 
     private String username;
     private String password;
@@ -28,4 +30,5 @@ public class User implements Serializable {
     private String url;
     private Integer status;
 
+    private List<Role> roles;
 }

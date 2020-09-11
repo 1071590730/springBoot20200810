@@ -3,6 +3,8 @@ package com.maiduoduo.module.user.service.impl;
 import com.maiduoduo.module.user.entity.User;
 import com.maiduoduo.module.user.mapper.UserMapper;
 import com.maiduoduo.module.user.service.UserService;
+import com.maiduoduo.module.userRole.entity.UserRole;
+import com.maiduoduo.module.userRole.mapper.UserRoleMapper;
 import com.maiduoduo.utils.MailUtils;
 import com.maiduoduo.utils.SaltUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -20,6 +22,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private UserRoleMapper userRoleMapper;
+
     @Override
     public void register(User user) {
         user.setStatus(0);
@@ -28,9 +33,13 @@ public class UserServiceImpl implements UserService {
         String md5Pwd = new Md5Hash(user.getPassword(), salt, 1024).toHex();
         user.setSalt(salt);
         user.setPassword(md5Pwd);
-
         userMapper.insertSelective(user);
-        MailUtils.sendMail(user.getEmail(), "<a href='http://localhost:8888/user/active/"+user.getUser_id()+"'>你正在注册xxxx系统，点击此链接以激活账户，若非本人注册请忽略。</a>", "激活邮件");
+
+        UserRole userRole = new UserRole();
+        userRole.setUserId(user.getUserId());
+        userRole.setRoleId(1);
+        userRoleMapper.insertSelective(userRole);
+        MailUtils.sendMail(user.getEmail(), "<a href='http://localhost:8888/user/active/"+user.getUserId()+"'>你正在注册xxxx系统，点击此链接以激活账户，若非本人注册请忽略。</a>", "激活邮件");
     }
 
 //        user.setPassword(MD5Util.getMD5(user.getPassword()));//MD5加密
@@ -52,15 +61,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public boolean updateStatusById(User user) {
-        int count = userMapper.updateByPrimaryKeySelective(user);
-        if (count > 0){
-            return true;
-        }else {
-            return false;
-        }
-    }
+//    @Override
+//    public boolean updateStatusById(User user) {
+//        int count = userMapper.updateByPrimaryKeySelective(user);
+//        if (count > 0){
+//            return true;
+//        }else {
+//            return false;
+//        }
+//    }
 
     @Override
     public User findUserByUsername(String username) {
@@ -68,5 +77,18 @@ public class UserServiceImpl implements UserService {
         user.setUsername(username);
 
         return userMapper.selectOne(user);
+    }
+
+    @Override
+    public void active(Long id) {
+        User user = new User();
+        user.setUserId(id);
+        user.setStatus(1);
+        userMapper.updateByPrimaryKeySelective(user);
+    }
+
+    @Override
+    public User findUserByUserId(Long userId) {
+        return userMapper.findUserByUserId(userId);
     }
 }
